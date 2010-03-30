@@ -113,8 +113,27 @@ class tPandora():
 		self.crash = 0
 		self.config = config
 
-        def emit(self, action):
-                print "Action Occured:", action
+
+        """A user should override these functions"""
+        def username_callback(self, username):
+                pass
+
+        def password_callback(self, password):
+                pass
+
+        def error_callback(self, error):
+                pass
+
+        def station_callback(self, station):
+                print "Station Changed to %s" % station
+        
+        def song_callback(self, title, artist, album,
+                          like):
+                print "Begin Playing %s %s %s (%s)" % (title, artist,
+                                                       album, like)
+
+        def second_callback(self, time):
+                print "Second Elapsed: %s" % time
 
         def start(self):
                 import threading
@@ -129,11 +148,11 @@ class tPandora():
 			char = self.pandora.stdout.read(1)
 			newline += char
 			if re.match(".+Username$",newline) is not None and "Error" not in newline:
-				self.emit("username %s" % self.sTitle)
+				self.username_callback(self.sTitle)
 				self.last = "username"
 					
 			if re.match(".+Password$",newline) is not None:
-				self.emit("Password %s" % self.sTitle)
+				self.password_callback(self.sTitle)
 				self.last = "password"
 			
 			elif char == "\n":
@@ -148,7 +167,7 @@ class tPandora():
 						
 					if merror is not None:
 						self.error = merror.group(1)
-						self.emit("oopts")
+						self.error_callback(self.error)
 						self.drun = 0
 						self.pandora.stdin.close()
 						self.pandora.stdout.close()
@@ -170,7 +189,7 @@ class tPandora():
 							self.stations.append(station)
 
 						self.last = "stations"	
-						self.emit("stations: %s" % station)
+						self.station_callback(station)
 						
 					
 					if title is not None:
@@ -184,12 +203,13 @@ class tPandora():
 							self.sLike = 0
 						
 						self.last = "song"
-						self.emit("newsong %s" % str(title.groups()))
+                                                self.song_callback(self.sTitle, self.sArtist, self.sAlbum,
+                                                                   self.sLike)
 		
 			elif re.match("^.+(\d+\:\d+)\/(\d+\:\d\d)$",newline):
 				stime = re.match("^.+(\d+\:\d+)\/(\d+\:\d\d)$",newline)
 				self.length = stime.group(1)+"/"+stime.group(2)
-				self.emit("second %s" % str(stime.groups()))
+				self.second_callback(newline)
 				newline = ""
 			else:
 				continue
@@ -204,7 +224,7 @@ class tPandora():
                         self.pandora.stdin.write(self.config.act_stationchange)
 		
                 self.station = station
-                self.pandora.stdin.write(str(station)+"\n")
+                self.pandora.stdin.write(str(self.stations.index(station))+"\n")
 
                 
 	def tiredSong(self):
@@ -221,19 +241,19 @@ class tPandora():
 		if not self.playing:
 			self.playing = 1
 		
-	def doLove(self):
+	def love(self):
 		if self.last == "song":
 	 		self.pandora.stdin.write(self.config.act_songlove)
 	
-	def doHate(self):
+	def hate(self):
 		if self.last == "song":
 			self.pandora.stdin.write(self.config.act_songban)
 
-	def doNext(self):
+	def next(self):
 		if self.last == "song":
 			self.pandora.stdin.write(self.config.act_songnext)
 
-	def doPlayPause(self):
+	def toggle(self):
 		if self.last == "stations":
 			self.pandora.stdin.write(str(0)+"\n")
 		else:
@@ -244,7 +264,7 @@ class tPandora():
 		else:
 			self.playing = 1
 	
-	def sQuit(self):
+	def quit(self):
 		self.drun = 0
 		self.pandora.stdin.write('\n'+self.config.act_quit)
 		self.pandora.wait()
@@ -277,5 +297,10 @@ if __name__ == '__main__':
         p = tPandora(c)
         p.start()
         pandora = p
-        import pdb
-        pdb.set_trace()
+        try:
+                import pdb
+                pdb.set_trace()
+        except:
+                p.quit()
+
+        p.quit()
