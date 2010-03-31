@@ -97,7 +97,7 @@ class Config:
 		return r.group(1)
 			
 		
-class tPandora():
+class Pandora():
 
 	def __init__(self, config):
 		self.sTitle = ""
@@ -294,7 +294,7 @@ class tPandora():
 if __name__ == '__main__':
         c = Config()
         c.load()
-        p = tPandora(c)
+        p = Pandora(c)
         p.start()
         pandora = p
         try:
