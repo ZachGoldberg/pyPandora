@@ -125,7 +125,7 @@ class Pandora():
                 pass
 
         def station_callback(self, station):
-                print "Station Changed to %s" % station
+                print "Station Loaded %s" % station
         
         def song_callback(self, title, artist, album,
                           like):
@@ -189,6 +189,8 @@ class Pandora():
 							self.stations.append(station)
 
 						self.last = "stations"	
+                                                if not hasattr(self, "station"):
+                                                        self.station = station
 						self.station_callback(station)
 						
 					
@@ -206,8 +208,8 @@ class Pandora():
                                                 self.song_callback(self.sTitle, self.sArtist, self.sAlbum,
                                                                    self.sLike)
 		
-			elif re.match("^.+(\d+\:\d+)\/(\d+\:\d\d)$",newline):
-				stime = re.match("^.+(\d+\:\d+)\/(\d+\:\d\d)$",newline)
+			elif re.match("^.+(\d+\:\d+)\/(\d+\:\d\d)$", newline):
+				stime = re.match("^.+(\d+\:\d+)\/(\d+\:\d\d)$", newline)
 				self.length = stime.group(1)+"/"+stime.group(2)
 				self.second_callback(newline)
 				newline = ""
