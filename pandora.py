@@ -156,7 +156,7 @@ class Pandora():
 				self.last = "password"
 			
 			elif char == "\n":
-				output = newline.split("|>")
+				output = newline.split("\x1b[2K")
 				newline = ""
 				for line in output:
 					if line == "":
