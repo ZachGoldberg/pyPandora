@@ -213,6 +213,7 @@ class Pandora():
 				self.length = stime.group(1)+"/"+stime.group(2)
 				self.second_callback(self.length)
 				newline = ""
+				self.playing = 1
 			else:
 				continue
 			
