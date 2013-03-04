@@ -208,10 +208,10 @@ class Pandora():
                                                 self.song_callback(self.sTitle, self.sArtist, self.sAlbum,
                                                                    self.sLike)
 		
-			elif re.match("^.+(\d+\:\d+)\/(\d+\:\d\d)$", newline):
-				stime = re.match("^.+(\d+\:\d+)\/(\d+\:\d\d)$", newline)
+			elif re.match("^.+(\d+\:\d+)\/(\d+\:\d\d).+", newline):
+				stime = re.match("^.+(\d+\:\d+)\/(\d+\:\d\d).+", newline)
 				self.length = stime.group(1)+"/"+stime.group(2)
-				self.second_callback(newline)
+				self.second_callback(self.length)
 				newline = ""
 			else:
 				continue
@@ -237,7 +237,7 @@ class Pandora():
 		return self.length
 
 	def newsong(self):
-		self.a.conf (self.sArtist, self.sAlbum)
+		self.a.conf(self.sArtist, self.sAlbum)
 		self.a.start()
 
 		if not self.playing:
@@ -254,6 +254,10 @@ class Pandora():
 	def next(self):
 		if self.last == "song":
 			self.pandora.stdin.write(self.config.act_songnext)
+
+	def info(self):
+		if self.last == "song":
+			self.pandora.stdin.write(self.config.act_songinfo)
 
 	def toggle(self):
 		if self.last == "stations":
